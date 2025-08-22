@@ -24,3 +24,4 @@ fmt-*.cmake
 fmt.pc
 
 cmakeUserPath.json
+run-msbuild.bat
