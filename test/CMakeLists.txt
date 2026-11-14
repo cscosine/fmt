@@ -57,7 +57,11 @@ add_fmt_test(format-test mock-allocator.h)
 if (MSVC)
   target_compile_options(format-test PRIVATE /bigobj)
 endif ()
-if (NOT (MSVC AND BUILD_SHARED_LIBS))
+# Not with the Xcode generator: format-impl-test.cc redefines FMT_ASSERT to throw (test-assert.h), the other sources
+# of the executable (header-only-test.cc, test-main sources) use the real one, which aborts: two definitions of the same
+# inline functions of fmt (e.g. bigint::operator*=), the linker keeps one. With Xcode it keeps the aborting one, and the
+# EXPECT_THROW of bigint_test.multiply aborts the test (Debug); Ninja / Makefiles keep the throwing one.
+if (NOT (MSVC AND BUILD_SHARED_LIBS) AND NOT CMAKE_GENERATOR STREQUAL "Xcode")
   add_fmt_test(format-impl-test HEADER_ONLY header-only-test.cc)
 endif ()
 add_fmt_test(ostream-test)
